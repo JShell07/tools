@@ -1,0 +1,35 @@
+#! /usr/bin/env sh
+
+# SVN RM tools
+
+AWK=/usr/bin/awk
+GREP=/bin/grep
+SVN=/usr/local/bin/svn
+Usage()
+{
+echo '
+Usage:
+ $1 [PATH]
+
+$1 will remove the files on SVN Server
+'
+}
+
+# main $PATH
+main()
+{
+	for file in `${SVN} st ${PATH} | ${GREP} '!' | ${AWK} '{print $2}'`
+	do
+		${SVN} rm $file
+	done
+}
+
+
+# --- Main ---
+if [ $# -lt 1 ]; then
+	Usage $0
+fi
+
+PATH=$1
+
+main

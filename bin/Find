@@ -1,0 +1,28 @@
+#! /bin/bash
+
+Usage()
+{
+    cat <<EOF
+
+Usage:  $0 <Path> <Name>
+For more detail, please see 'man find'
+EOF
+    exit 1
+}
+
+[ $# -lt 2 ] && Usage
+
+FIND_PATH="$1"
+FIND_NAME="$2"
+
+shift 2
+OPTIONS=$@
+
+find $FIND_PATH -name "$FIND_NAME" $OPTIONS
+
+echo ""
+echo "+--------------------------+"
+echo "|   F I N D    I N F O     |"
+echo "+--------------------------+"
+echo "Path - $FIND_PATH"
+echo "Name - $FIND_NAME"

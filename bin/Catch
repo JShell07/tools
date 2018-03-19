@@ -1,0 +1,57 @@
+#! /usr/bin/env sh 
+
+
+TARGET=w_catch
+CUR_DIR=`pwd`
+DEST_DIR=$CUR_DIR/$TARGET
+SRC_DIR=
+CATCH_ITEMS_FILE=
+
+
+Usage()
+{
+	echo "
+Usage:
+$0 [catch_file] [path]
+  path          - where to get the items.
+  catch_file    - every line record items you want get in the file.
+
+$0 will mkdir named w_catch, and put the items from [path] in it.
+"
+	return 0;
+}
+
+
+
+Check()
+{
+	if [ $# -lt 2 ]; then
+		echo "Invaild parameters, see usage"
+		Usage
+	fi
+
+	SRC_DIR=$2
+	CATCH_ITEMS_FILE=$1
+}
+
+Catch()
+{
+	rm -rf $DEST_DIR
+	rm -rf $CUR_DIR/$TARGET.tar
+
+	mkdir -p $DEST_DIR
+	
+	for file in `awk '{print $0}' $CATCH_ITEMS_FILE`
+	do
+		cp -rf $SRC_DIR/$file $DEST_DIR
+	done
+	
+	cd $CUR_DIR && tar -cvf $CUR_DIR/$TARGET.tar $TARGET 
+}
+
+# --- Main ---
+Check $*
+
+Catch
+
+

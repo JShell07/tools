@@ -1,0 +1,39 @@
+#! /bin/sh
+
+#
+# Purpose: make it easily to catch files from server to local PC
+#
+# Maintainer: wang.kai@sunmedia.cn
+# 
+
+Usage()
+{
+	echo "
+Usage:
+  $0 -p[0-9] [-r] [--path=path_dir]
+  -p        -- Patch depth
+  -r        -- Rollback the patch
+  --path    -- Patch file from the directory
+"
+}
+
+while [ $# -gt 0 ]
+do
+	case x$1 in
+	x-p[0-9]) Depth=$1 ;;
+	x-r) Rollback=`echo $1 | tr [:lower:] [:upper:]` ;;
+	x--path*) Patch_path=${1##*=} ;;
+	*) Usage ;;
+	esac
+	shift 1
+done
+
+${Depth:? "Error, need the patch depth"}
+Rollback=${Rollback:-""}
+Patch_path=${Patch_path:-`pwd`}
+
+for patch in $Patch_path/*.patch 
+do
+	echo "Patch File: $patch"
+	eval patch $Rollback $Depth < $patch
+done

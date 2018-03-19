@@ -1,0 +1,44 @@
+#!/bin/bash
+
+Usage()
+{
+    cat <<EOF
+Usage:  $0 <match_value> <files> [invert-match]
+For more detail, please see 'man grep'
+EOF
+    exit 1
+}
+
+[ $# -lt 1 ] && Usage
+
+GREP_VALUE="$1"
+GREP_PATH=$2
+
+if [ x"$3" != x ]; then
+        GREP_FILTER=$3
+fi
+
+if [ -z $GREP_PATH ]; then
+# indicate we are using pipe cmd, like ls | Grep <value>
+        EXTRA_OPTIONS="-"
+else
+:
+#       shift 2
+#       EXTRA_OPTIONS=$@
+fi
+
+if [ x"$GREP_FILTER" != x ]; then
+        grep -rn "$GREP_VALUE" $GREP_PATH --color=auto $EXTRA_OPTIONS | sort | \
+        grep -v $GREP_FILTER | grep "$GREP_VALUE" --color=auto
+else
+        grep -rn "$GREP_VALUE" $GREP_PATH --color=auto $EXTRA_OPTIONS | sort | \
+        grep "$GREP_VALUE" --color=auto
+fi
+
+echo ""
+echo "+--------------------------+"
+echo "|   G R E P    I N F O     |"
+echo "+--------------------------+"
+echo "Vaule - $GREP_VALUE"
+echo "Path  - $GREP_PATH"
+
