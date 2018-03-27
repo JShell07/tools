@@ -1,0 +1,96 @@
+#! /bin/bash 
+
+display_current()
+{
+#    printf "\\033[31m\n"
+#    printf "<INFOR>\n"
+#    printf "+--------------------------+\n"
+#    printf "| Current JShell Work Path |\n"
+#    printf "+--------------------------+\n"
+#    printf "\\033[0m\n"
+
+    printf "\\033[33m\n"
+    printf "  .---------------------------------,\n"
+    printf " /                                 /|\n"
+    printf "+--------------------------------+  |\n"
+    printf "|       JShell Work Path         |  /\n"
+    printf "|________________________________| /\n"
+    printf "+--------------------------------+\n"
+    printf "\\033[0m"
+
+    [ -s ~/.JShell_Work_Path ] && cat ~/.JShell_Work_Path
+
+}
+
+Usage()
+{
+    cat <<EOF
+Usage:
+  $0 <naked_path> [real_path]
+
+Add <naked_path> in ~/.JShell_Work_Path, and
+when we cd $<naked_path>, we will goto the <real_path>.
+
+Note: if [real_pat] is empty, we will try to delete <naked_path>.
+
+<CARE>
+We MUST use 'source $0' to run scripts, or environment variable cannot work.
+
+source xxx.sh - we will in a same process.
+./xxx.sh      - we will create child process, and child process's environment variable cannot
+                work in parent process.
+EOF
+
+    display_current
+
+   return 0 
+}
+
+modify_own_profile()
+{
+    local nake=$1
+    local real=$2
+
+    if [ x$real != x ]; then
+        # add naked path
+        grep -q "export ${nake}=.*" ~/.JShell_Work_Path
+        if [ $? -eq 0 ]; then
+            sed -i "s#^export ${nake}=.*#export ${nake}=\"${real}\"#" ~/.JShell_Work_Path
+        else
+            echo "export ${nake}=\"${real}\"" >> ~/.JShell_Work_Path
+        fi
+
+    else
+        # remove naked path
+        unset ${nake}
+        sed -i "/export ${nake}=/d" ~/.JShell_Work_Path
+    fi
+}
+
+main()
+{
+    local nake=$1
+    local real=$2
+
+    [ ! -f ~/.JShell_Work_Path ] && \
+        touch ~/.JShell_Work_Path && \
+        chmod 644 ~/.JShell_Work_Path
+
+    # add source "~/.JShell_Work_Path"
+    grep -q '. ~/.JShell_Work_Path' ~/.bash_profile
+    if [ $? -ne 0 ]; then
+        echo "" >> ~/.bash_profile
+        echo "if [ -f ~/.JShell_Work_Path ]; then" >> ~/.bash_profile
+        echo "    . ~/.JShell_Work_Path" >> ~/.bash_profile
+        echo "fi" >>~/.bash_profile
+    fi
+    modify_own_profile $nake $real
+#    source ~/.bash_profile
+    source ~/.JShell_Work_Path
+
+#    display_current
+}
+
+[ $# -lt 1 ] && Usage
+
+main $@
