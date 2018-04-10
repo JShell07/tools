@@ -60,7 +60,7 @@ modify_own_profile()
             echo "export ${nake}=\"${real}\"" >> ~/.JShell_Work_Path
         fi
 
-    else
+    elif [ x$nake != x ]; then
         # remove naked path
         unset ${nake}
         sed -i "/export ${nake}=/d" ~/.JShell_Work_Path
